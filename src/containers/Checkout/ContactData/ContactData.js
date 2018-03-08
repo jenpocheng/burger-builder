@@ -43,8 +43,9 @@ class ContactData extends Component {
         value: '',
         validation: {
           required: true,
-          minLength:5,
-          maxLength:5
+          minLength: 5,
+          maxLength: 5,
+          isNumeric: true
 
         },
         valid: false,
@@ -71,7 +72,8 @@ class ContactData extends Component {
         },
         value: '',
         validation: {
-          required: true
+          required: true,
+          isEmail: true
         },
         valid: false,
         touched: false
@@ -85,17 +87,17 @@ class ContactData extends Component {
           ]
         },
         value: '',
-        valid: true,
-        touched: false
+        validation: {},
+        valid: true
       }
     },
     formIsValid: false,
     loading: false
   }
 
-  orderHandler = (event) => {
+  orderHandler = ( event ) => {
     event.preventDefault();
-    this.setState({loading: true});
+    this.setState( { loading: true } );
     const formData = {};
     for (let formElementIdentifier in this.state.orderForm) {
       formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
@@ -117,6 +119,10 @@ class ContactData extends Component {
 
   checkValidity(value, rules) {
     let isValid = true;
+    if (!rules) {
+        return true;
+    }
+
     if (rules.required) {
       isValid = value.trim() !== '' && isValid;
     }
@@ -127,6 +133,16 @@ class ContactData extends Component {
 
     if (rules.maxLength) {
       isValid = value.length <= rules.maxLength && isValid;
+    }
+
+    if (rules.isEmail) {
+      const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+      isValid = pattern.test(value) && isValid
+    }
+
+    if (rules.isNumeric) {
+      const pattern = /^\d+$/;
+      isValid = pattern.test(value) && isValid
     }
 
     return isValid;
@@ -144,9 +160,9 @@ class ContactData extends Component {
     updatedFormElement.touched = true;
     updatedOrderForm[inputIdentifier] = updatedFormElement;
 
-    let formIsValid = false;
+    let formIsValid = true;
     for (let inputIdentifier in updatedOrderForm) {
-      formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid
+      formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid;
     }
     console.log(formIsValid)
     this.setState({orderForm: updatedOrderForm, formIsValid: formIsValid});
@@ -171,12 +187,12 @@ class ContactData extends Component {
                 invalid={!formElement.config.valid}
                 shouldValidate={formElement.config.validation}
                 touched={formElement.config.touched}
-                changed={(event) => this.inputChangedHandler(event, formElement.id)}/>
+                changed={(event) => this.inputChangedHandler(event, formElement.id)} />
             ))}
             <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
           </form>
     );
-    if (this.state.loading) {
+    if ( this.state.loading ) {
       form = <Spinner />;
     }
     return (

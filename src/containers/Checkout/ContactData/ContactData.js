@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+
 import Button from '../../../components/UI/Button/Button';
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import classes from './ContactData.css';
@@ -49,7 +50,6 @@ class ContactData extends Component {
           minLength: 5,
           maxLength: 5,
           isNumeric: true
-
         },
         valid: false,
         touched: false
@@ -109,25 +109,25 @@ class ContactData extends Component {
       price: this.props.price,
       orderData: formData
     }
-    this.props.onOrderBurger(order)
+    this.props.onOrderBurger(order, this.props.token);
   }
 
   checkValidity(value, rules) {
     let isValid = true;
     if (!rules) {
-        return true;
+      return true;
     }
 
     if (rules.required) {
-      isValid = value.trim() !== '' && isValid;
+      isValid = value.trim() !== '' && isValid
     }
 
     if (rules.minLength) {
-      isValid = value.length >= rules.minLength && isValid;
+      isValid = value.length >= rules.minLength && isValid
     }
 
     if (rules.maxLength) {
-      isValid = value.length <= rules.maxLength && isValid;
+      isValid = value.length <= rules.maxLength && isValid
     }
 
     if (rules.isEmail) {
@@ -171,20 +171,20 @@ class ContactData extends Component {
       });
     }
     let form = (
-          <form onSubmit={this.orderHandler}>
-            {formElementsArray.map(formElement => (
-              <Input 
-                key={formElement.id}
-                elementType={formElement.config.elementType}
-                elementConfig={formElement.config.elementConfig}
-                value={formElement.config.value}
-                invalid={!formElement.config.valid}
-                shouldValidate={formElement.config.validation}
-                touched={formElement.config.touched}
-                changed={(event) => this.inputChangedHandler(event, formElement.id)} />
-            ))}
-            <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
-          </form>
+      <form onSubmit={this.orderHandler}>
+        {formElementsArray.map(formElement => (
+          <Input
+            key={formElement.id}
+            elementType={formElement.config.elementType}
+            elementConfig={formElement.config.elementConfig}
+            value={formElement.config.value}
+            invalid={!formElement.config.valid}
+            shouldValidate={formElement.config.validation}
+            touched={formElement.config.touched}
+            changed={(event) => this.inputChangedHandler(event, formElement.id)} />
+        ))}
+        <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
+      </form>
     );
     if ( this.props.loading ) {
       form = <Spinner />;
@@ -202,13 +202,14 @@ const mapStateToProps = state => {
   return {
     ings: state.burgerBuilder.ingredients,
     price: state.burgerBuilder.totalPrice,
-    loading: state.order.loading
+    loading: state.order.loading,
+    token: state.auth.token
   }
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
+    onOrderBurger: (orderData, token) => dispatch(actions.purchaseBurger(orderData, token))
   };
 };
 
